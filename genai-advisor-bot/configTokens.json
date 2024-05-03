@@ -1,0 +1,6 @@
+{
+    "supportAdministrators":false,
+    "supportVerification":false,
+    "integration":"genai-advisor-bot",
+    "tokens":[]
+}

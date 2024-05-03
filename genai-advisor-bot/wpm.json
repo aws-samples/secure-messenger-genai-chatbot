@@ -1,0 +1,18 @@
+{
+  "apps": [
+    {
+      "name": "genai-advisor-bot",
+      "script": "./genai-advisor-bot.js",
+      "instances": 1,
+      "max_memory_restart": "128M",
+      "node_args": [
+        "--nouse-idle-notification"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "args": []
+    }
+  ],
+  "name": "genai-advisor-bot"
+}

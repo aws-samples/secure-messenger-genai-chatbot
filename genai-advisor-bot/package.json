@@ -1,0 +1,33 @@
+{
+  "name": "genai-advisor-bot",
+  "version": "1.0.0",
+  "description": "Wickr and AWS GenAI Chatbot integration demo.",
+  "main": "genai-advisor-bot.js",
+  "author": "steditt",
+  "license": "MIT-0",
+  "scripts": {
+    "start": "nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
+    "stop": "kill $(cat $(cat pidLocation.json))",
+    "restart": "kill $(cat $(cat pidLocation.json)) && nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.433.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.465.0",
+    "@aws-sdk/client-dynamodb": "^3.468.0",
+    "@aws-sdk/client-secrets-manager": "^3.462.0",
+    "@aws-sdk/client-ssm": "^3.468.0",
+    "@aws-sdk/credential-providers": "^3.360.0",
+    "@aws-sdk/lib-dynamodb": "^3.468.0",
+    "dotenv": "^8.2.0",
+    "filereader": "^0.10.3",
+    "prompt": "^1.0.0",
+    "websocket": "^1.0.34",
+    "wickrio-bot-api": "6.20.x",
+    "ws": "^8.14.2"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

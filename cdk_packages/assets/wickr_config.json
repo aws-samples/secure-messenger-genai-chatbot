@@ -1,0 +1,13 @@
+{
+  "clients": [
+    {
+      "tokens": [
+        {
+          "name": "DATABASE_ENCRYPTION_CHOICE",
+          "value": "yes"
+        }
+      ]
+    }
+  ]
+}
+
