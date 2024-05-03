@@ -249,7 +249,6 @@ cdk.out
 .review.out
 .idea
 /cdk.context.json
-*.js
 !jest.config.js
 *.d.ts
 node_modules
