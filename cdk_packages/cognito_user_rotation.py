@@ -14,14 +14,9 @@ from cdk_nag import NagSuppressions
 from constructs import Construct
 
 import cdk_packages.utils as utils
+import cdk_packages.genai_chatbot_params as genai_chatbot_params
 
 dirname = os.path.dirname(__file__)
-
-GEN_AI_CHATBOT_STACK_NAME = 'GenAIChatBotStack'
-GEN_AI_CHATBOT_RAG_WORKSPACES_TABLE_NAME = f'{GEN_AI_CHATBOT_STACK_NAME}-RagEnginesRagDynamoDBTablesWorkspaces'
-GEN_AI_CHATBOT_MODEL_NAME = 'meta-LLama2-13b-chat'
-GEN_AI_CHATBOT_RAG_WORKSPACE_NAME = 'WickrIO-Bot-Advisor'
-GEN_AI_CHATBOT_COGNITO_USER_EMAIL_DOMAIN = 'example.com'
 
 client_secretsmanager = boto3.client('secretsmanager')
 client_cloudformation = boto3.client('cloudformation')
@@ -51,7 +46,7 @@ class CognitoUserRotation(Construct):
                     'cognito-idp:AdminSetUserPassword',
                 ],
                 resources=[
-                    f'{utils.get_user_pool_arn(GEN_AI_CHATBOT_STACK_NAME)}',
+                    f'{utils.get_user_pool_arn(genai_chatbot_params.GEN_AI_CHATBOT_STACK_NAME)}',
                 ]
             )
         )

@@ -57,22 +57,20 @@ solution. Please follow the instructions below before deploying the Wickr IO and
 
 1. Follow the instructions outlined in the [Deploy](https://aws-samples.github.io/aws-genai-llm-chatbot/guide/deploy.html#aws-cloud9) section
 of the AWS GenAI LLM Chatbot solution.
-2. During selection of the features via `npm run create`, ensure you select the "Llama2_13b_Chat" SageMaker model:
+2. During selection of the features, ensure you select the "Llama2_13b_Chat" SageMaker model:
 ```shell
 ...
-? Which SageMaker Models do you want to enable (enter for None, space to select) ... 
-. FalconLite
-√ Llama2_13b_Chat
-. Mistral7b_Instruct
+? Which SageMaker Models do you want to enable …  SPACE to select, ENTER to confirm selection [denotes instance size to host model]
+...
+✔ Llama2_13b_Chat [ml.g5.12xlarge]
 ...
 ```
 3. ... and enable RAG and "Kendra (managed)" as data store:
 ```shell
 ...
-✔ Do you want to enable RAG (Y/n) · true
+✔ Do you want to enable RAG (y/N) · true
 ? Which datastores do you want to enable for RAG …  SPACE to select, ENTER to confirm selection
-. Aurora
-. OpenSearch
+...
 ✔ Kendra (managed)
 ...
 ```

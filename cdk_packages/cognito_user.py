@@ -20,14 +20,9 @@ from cdk_nag import NagSuppressions
 from constructs import Construct
 
 import cdk_packages.utils as utils
+import cdk_packages.genai_chatbot_params as genai_chatbot_params
 
 dirname = os.path.dirname(__file__)
-
-GEN_AI_CHATBOT_STACK_NAME = 'GenAIChatBotStack'
-GEN_AI_CHATBOT_RAG_WORKSPACES_TABLE_NAME = f'{GEN_AI_CHATBOT_STACK_NAME}-RagEnginesRagDynamoDBTablesWorkspaces'
-GEN_AI_CHATBOT_MODEL_NAME = 'meta-LLama2-13b-chat'
-GEN_AI_CHATBOT_RAG_WORKSPACE_NAME = 'WickrIO-Bot-Advisor'
-GEN_AI_CHATBOT_COGNITO_USER_EMAIL_DOMAIN = 'example.com'
 
 client_cloudformation = boto3.client('cloudformation')
 client_cognito_idp = boto3.client('cognito-idp')
@@ -55,7 +50,7 @@ class CognitoUser(Construct):
                     'cognito-idp:ListUsers',
                 ],
                 resources=[
-                    f'{utils.get_user_pool_arn(GEN_AI_CHATBOT_STACK_NAME)}',
+                    f'{utils.get_user_pool_arn(genai_chatbot_params.GEN_AI_CHATBOT_STACK_NAME)}',
                 ]
             )
         )
@@ -77,14 +72,14 @@ class CognitoUser(Construct):
             self, 'Custom resource - Cognito user - provider',
             on_event_handler=event_handler_fn,
         )
-        genai_stack_params = utils.get_genai_stack_params(GEN_AI_CHATBOT_STACK_NAME)
-        genai_stack_params.websocket_endpoint = utils.get_websocket_endpoint(GEN_AI_CHATBOT_STACK_NAME)
+        genai_stack_params = utils.get_genai_stack_params(genai_chatbot_params.GEN_AI_CHATBOT_STACK_NAME)
+        genai_stack_params.websocket_endpoint = utils.get_websocket_endpoint(genai_chatbot_params.GEN_AI_CHATBOT_STACK_NAME)
         cdk.CustomResource(
             self, 'Custom resource - Cognito user',
             service_token=cr_provider.service_token,
             properties={
                 'WickrUserName': params.wickrio_config.bot_user_id,
-                'EmailDomain': GEN_AI_CHATBOT_COGNITO_USER_EMAIL_DOMAIN,
+                'EmailDomain': genai_chatbot_params.GEN_AI_CHATBOT_COGNITO_USER_EMAIL_DOMAIN,
                 'AuthenticationUserPoolWebClientId': genai_stack_params.user_pool_web_client_id,
                 'AuthenticationUserPoolId': genai_stack_params.user_pool_id,
                 'ChatBotApiRestApiChatBotApiEndpoint': genai_stack_params.websocket_endpoint,
@@ -112,14 +107,14 @@ class CognitoUser(Construct):
         )
 
         # Get the DynamoDB table with the RAG workspaces and store in SSM Parameter Store.
-        rag_workspaces_table_name = utils.get_rag_workspaces_table_name(GEN_AI_CHATBOT_RAG_WORKSPACES_TABLE_NAME)
+        rag_workspaces_table_name = utils.get_rag_workspaces_table_name(genai_chatbot_params.GEN_AI_CHATBOT_RAG_WORKSPACES_TABLE_NAME)
         ssm.StringParameter(
             self, 'Parameter - RagWorkspacesTableName',
             parameter_name='/Wickr-GenAI-Chatbot/model-rag-params',
             string_value=json.dumps(
                 {
-                    'model_name': GEN_AI_CHATBOT_MODEL_NAME,
-                    'rag_workspace_name': GEN_AI_CHATBOT_RAG_WORKSPACE_NAME,
+                    'model_name': genai_chatbot_params.GEN_AI_CHATBOT_MODEL_NAME,
+                    'rag_workspace_name': genai_chatbot_params.GEN_AI_CHATBOT_RAG_WORKSPACE_NAME,
                     'rag_workspaces_table_name': rag_workspaces_table_name,
                 }
             ),
