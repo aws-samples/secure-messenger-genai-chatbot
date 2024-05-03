@@ -51,11 +51,11 @@ the Cognito user. After successful authentication, messages are exchanged via th
 
 ### Deployment of the AWS GenAI LLM Chatbot
 
-This project is dependent on a successful deployment and configuration of the [AWS GenAI LLM Chatbot](https://github.com/aws-samples/aws-genai-llm-chatbot])
+This project is dependent on a successful deployment and configuration of the [AWS GenAI LLM Chatbot](https://github.com/aws-samples/aws-genai-llm-chatbot)
 solution. Please follow the instructions below before deploying the Wickr IO and AWS GenAI Chatbot integration 
 (described in section [Deployment](#deployment)).
 
-1. Follow the instructions outlined in the [Deploy](https://github.com/aws-samples/aws-genai-llm-chatbot#deploy) section
+1. Follow the instructions outlined in the [Deploy](https://aws-samples.github.io/aws-genai-llm-chatbot/guide/deploy.html#aws-cloud9) section
 of the AWS GenAI LLM Chatbot solution.
 2. During selection of the features via `npm run create`, ensure you select the "Llama2_13b_Chat" SageMaker model:
 ```shell
@@ -113,8 +113,8 @@ configuration is interpreted as an escape character. This leads to a failing log
 ## Deployment
 
 This section describes the deployment of the Wickr IO integration. All commands shown below are executed in a 
-[Cloud9 environment](https://us-west-2.console.aws.amazon.com/cloud9control/home?region=us-west-2#/) with Ubuntu. Use 
-instance type t3.small (2 GiB RAM + 2 vCPU) for a minimal configuration.
+[Cloud9 environment](https://eu-west-1.console.aws.amazon.com/cloud9control/home?region=eu-west-1#/) with Ubuntu. You
+may want to reuse the Cloud9 instance used for the [Deployment of the AWS GenAI LLM Chatbot](#Deployment-of-the-AWS-GenAI-LLM-Chatbot).
 
 It is recommended to deploy in the Ireland (eu-west-1) AWS region. The project has been tested in this region.
 
