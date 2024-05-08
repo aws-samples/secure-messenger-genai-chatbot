@@ -1,4 +1,7 @@
+import { v4 as uuidv4 } from "uuid";
 import {ChatbotClient} from "./components/chatbot.js";
 
 const awsChatbot = new ChatbotClient();
-await awsChatbot.subscribeChatbotReceiveMsg("0871ef0b-e48a-44eb-a394-04173d62689b");
+const sessionId = uuidv4();
+awsChatbot.subscribeChatbotReceiveMsg(sessionId);
+awsChatbot.send(sessionId, "Where is Berlin?");

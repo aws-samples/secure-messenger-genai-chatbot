@@ -2,8 +2,10 @@ import {openWebsocket} from "./websocket.js";
 import fetch from "node-fetch";
 
 class GraphQlClient {
-    constructor(wsUri, hostname, jwtToken) {
+    constructor(region, wsUri, gqlUri, hostname, jwtToken) {
+        this.region = region;
         this.wsUri = wsUri;
+        this.gqlUri = gqlUri;
         this.hostname = hostname;
         this.jwtToken = jwtToken;
         this.websocket = null;
@@ -25,6 +27,31 @@ class GraphQlClient {
         await this.initGraphqlConnection();
         this.websocket.send(createSubscriptionRegistrationMsg(sessionId, query, this.hostname, this.jwtToken));
     }
+
+    async sendQuery(request) {
+        const requestStr = JSON.stringify(request);
+        fetch(this.gqlUri, {
+            method: 'POST',
+            body: JSON.stringify({
+                query: `
+                    mutation MyMutation($data: String!) {
+                        sendQuery(data: $data)
+                    }
+                `,
+                variables: {
+                    data: JSON.stringify(request),
+                },
+            }),
+            headers: {
+                'content-type': 'application/json',
+                'aws_appsync_region': this.region,
+                'aws_appsync_authenticationType': "AMAZON_COGNITO_USER_POOLS",
+                Authorization: this.jwtToken,
+            }
+        }).then(async (data) => {
+            console.log(JSON.stringify(await data.json(), null, 4));
+        });
+    }
 }
 
 const gqlMsgHandlers = {
@@ -39,8 +66,9 @@ function handleConnectionAck() {
     console.log("GraphQL - connection_ack received");
 }
 
-function handleData() {
+function handleData(data) {
     console.log("GraphQL - data received.");
+    console.log("data: ", JSON.stringify(data, null, 4));
 }
 
 function handleKa() {
@@ -79,30 +107,6 @@ function createSubscriptionRegistrationMsg(sessionId, query, hostname, jwtToken)
             }
         },
         type: "start"
-    });
-}
-
-async function runQuery() {
-    fetch(graphqlApiDefinition.uris.GRAPHQL, {
-        method: 'POST',
-        body: JSON.stringify({
-            query: `
-                query MyQuery {
-                    listWorkspaces {
-                        name
-                    }
-                }
-            `,
-            variables: {},
-        }),
-        headers: {
-            'content-type': 'application/json',
-            'aws_appsync_region': region,
-            'aws_appsync_authenticationType': "AMAZON_COGNITO_USER_POOLS",
-            Authorization: idToken,
-        }
-    }).then(async (data) => {
-        console.log(JSON.stringify(await data.json(), null, 4));
     });
 }
 

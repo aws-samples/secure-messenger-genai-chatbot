@@ -32,4 +32,4 @@ async function getCognitoUser() {
     return {userPoolWebClientId: userPoolWebClientId, user: userId, password: pwd};
 }
 
-export {getGraphqlApiDefinition, getCognitoUser};
+export {getGraphqlApiDefinition, getCognitoUser, region};
