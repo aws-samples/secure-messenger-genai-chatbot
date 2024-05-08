@@ -5,6 +5,7 @@
   "main": "genai-advisor-bot.js",
   "author": "steditt",
   "license": "MIT-0",
+  "type": "module",
   "scripts": {
     "start": "nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
     "stop": "kill $(cat $(cat pidLocation.json))",
@@ -12,22 +13,27 @@
     "test": "jest"
   },
   "dependencies": {
-    "@aws-sdk/client-bedrock-runtime": "^3.433.0",
-    "@aws-sdk/client-cognito-identity-provider": "^3.465.0",
+    "@aws-crypto/sha256-js": "^5.2.0",
+    "@aws-sdk/client-appsync": "^3.569.0",
+    "@aws-sdk/client-cognito-identity": "^3.569.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.569.0",
     "@aws-sdk/client-dynamodb": "^3.468.0",
     "@aws-sdk/client-secrets-manager": "^3.462.0",
     "@aws-sdk/client-ssm": "^3.468.0",
-    "@aws-sdk/credential-providers": "^3.360.0",
     "@aws-sdk/lib-dynamodb": "^3.468.0",
+    "aws-amplify": "^6.2.0",
     "dotenv": "^8.2.0",
-    "filereader": "^0.10.3",
-    "prompt": "^1.0.0",
-    "websocket": "^1.0.34",
-    "wickrio-bot-api": "6.20.x",
-    "ws": "^8.14.2"
+    "graphql": "^14.7.0",
+    "graphql-tag": "^2.12.6",
+    "graphql-ws": "^5.16.0",
+    "node-fetch": "^2.7.0",
+    "uuid": "^9.0.1",
+    "wickrio_addon": "^6.34.2",
+    "wickrio-bot-api": "^6.34.1",
+    "ws": "^8.17.0"
   },
   "keywords": [],
   "devDependencies": {
-    "jest": "^29.7.0"
+    "jest": ">=29.7.0"
   }
 }

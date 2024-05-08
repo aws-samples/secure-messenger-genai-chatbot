@@ -12,6 +12,7 @@ from cdk_packages.iam_user import IamUser
 from cdk_packages.iam_user_rotation import IamUserRotation
 from cdk_packages.cognito_user import CognitoUser
 from cdk_packages.cognito_user_rotation import CognitoUserRotation
+from cdk_packages.appsync_cfg import AppSyncCfg
 
 
 class Params:
@@ -36,3 +37,4 @@ class WickrGenaiChatbotStack(cdk.Stack):
         params.iam_user_rotation = IamUserRotation(self, 'Wickr IO IAM user rotation', params)
         params.cognito_user = CognitoUser(self, 'Wickr IO Cognito user', params)
         params.cognito_user_rotation = CognitoUserRotation(self, 'Wickr IO Cognito user rotation', params)
+        params.appsync_cfg = AppSyncCfg(self, 'AppSync Configuration', params)

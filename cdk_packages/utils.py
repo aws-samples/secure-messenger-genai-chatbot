@@ -26,7 +26,8 @@ def get_genai_stack_params(stack_name):
     try:
         user.user_pool_web_client_id = value_by_key_prefix(stack_output, 'AuthenticationUserPoolWebClientId')
         user.user_pool_id = value_by_key_prefix(stack_output, 'AuthenticationUserPoolId')
-        user.chat_bot_api_endpoint = value_by_key_prefix(stack_output, 'ChatBotApiRestApiChatBotApiEndpoint')
+        user.chat_bot_api_endpoint = value_by_key_prefix(stack_output, 'ChatBotApiGraphqlAPIURL')
+        user.chat_bot_api_graphql_id = value_by_key_prefix(stack_output, 'ChatBotApiGraphqlapiId')
     except KeyError as e:
         raise ValueError(
             f'The following error occurred while trying to get attributes from the Cognito user pool:\n\n'
@@ -88,22 +89,6 @@ def get_cf_stack_output(stack_name):
         for entry in gen_ai_chatbot_stack['Outputs']
     }
     return output
-
-
-def get_websocket_endpoint(stack_name):
-    """
-    Get the websocket API endpoint of the AWS GenAI Chatbot application. The Wickr IO integration uses this
-    endpoint to submit messages and receive responses.
-
-    :return: The websocket endpoint.
-    """
-    response = client_apigatewayv2.get_apis()
-    gen_ai_websocket_api = next(
-        item
-        for item in response['Items']
-        if item['Tags'].get('aws:cloudformation:stack-name', None) == stack_name
-    )
-    return gen_ai_websocket_api['ApiEndpoint']
 
 
 def get_rag_workspaces_table_name(table_name):
