@@ -2,13 +2,14 @@ import {openWebsocket} from "./websocket.js";
 import fetch from "node-fetch";
 
 class GraphQlClient {
-    constructor(region, wsUri, gqlUri, hostname, jwtToken) {
+    constructor(region, wsUri, gqlUri, hostname, jwtToken, handleQqlData) {
         this.region = region;
         this.wsUri = wsUri;
         this.gqlUri = gqlUri;
         this.hostname = hostname;
         this.jwtToken = jwtToken;
         this.websocket = null;
+        if (handleQqlData) gqlMsgHandlers.data = handleQqlData;
     }
 
     async initWebsocket() {

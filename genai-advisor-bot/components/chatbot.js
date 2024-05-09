@@ -4,14 +4,15 @@ import {GraphQlClient} from "./graphql.js";
 
 
 class ChatbotClient {
-    constructor() {
+    constructor(config) {
+        this.config = config;
         this.graphqlApiDefinition = null;
         this.idToken = null;
         this.gqlClient = null;
         this.initialized = false;
     }
 
-    async initClient() {
+    async initClient(handleQqlData) {
         this.graphqlApiDefinition = await getGraphqlApiDefinition();
         this.idToken = await getIdToken(await getCognitoUser());
         this.gqlClient = new GraphQlClient(
@@ -20,22 +21,29 @@ class ChatbotClient {
             this.graphqlApiDefinition.uris.GRAPHQL,
             this.graphqlApiDefinition.dns.GRAPHQL,
             this.idToken,
+            handleQqlData
         );
         this.initialized = true;
     }
 
-    async send(sessionId, text) {
+    async send(sessionId, text, config) {
         if (!this.initialized) {
             await this.initClient();
         }
-        await this.gqlClient.sendQuery(
-            createRequest(text, "anthropic.claude-v2", "bedrock", sessionId, "")
-        );
+        if (config) {
+            await this.gqlClient.sendQuery(
+                createRequest(text, sessionId, config.modelName, config.provider, config.workspaceId)
+            );
+        } else {
+            await this.gqlClient.sendQuery(
+                createRequest(text, sessionId, this.config.modelName, this.config.provider, this.config.workspaceId)
+            );
+        }
     }
 
-    async subscribeChatbotReceiveMsg(sessionId) {
+    async subscribeChatbotReceiveMsg(sessionId, handleQqlData) {
         if (!this.initialized) {
-            await this.initClient();
+            await this.initClient(handleQqlData);
         }
 
         const query = JSON.stringify({
@@ -51,7 +59,7 @@ class ChatbotClient {
     }
 }
 
-function createRequest(text, modelName, provider, sessionId, workspaceId) {
+function createRequest(text, sessionId, modelName, provider, workspaceId) {
     return {
         "action": "run",
         "modelInterface": "langchain",
