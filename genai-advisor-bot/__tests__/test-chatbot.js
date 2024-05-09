@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import {ChatbotClient} from "./components/chatbot.js";
+import {ChatbotClient} from "../components/chatbot.mjs";
 
 function handleQqlData(data) {
     console.log("test-node16 - data received.");

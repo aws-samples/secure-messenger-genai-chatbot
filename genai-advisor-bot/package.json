@@ -5,7 +5,6 @@
   "main": "genai-advisor-bot.js",
   "author": "steditt",
   "license": "MIT-0",
-  "type": "module",
   "scripts": {
     "start": "nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
     "stop": "kill $(cat $(cat pidLocation.json))",
@@ -27,6 +26,7 @@
     "graphql-tag": "^2.12.6",
     "graphql-ws": "^5.16.0",
     "node-fetch": "^2.7.0",
+    "prompt": "^1.3.0",
     "uuid": "^9.0.1",
     "wickrio_addon": "^6.34.2",
     "wickrio-bot-api": "^6.34.1",

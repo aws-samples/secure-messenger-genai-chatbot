@@ -1,4 +1,4 @@
-import {openWebsocket} from "./websocket.js";
+import {openWebsocket} from "./websocket.mjs";
 import fetch from "node-fetch";
 
 class GraphQlClient {

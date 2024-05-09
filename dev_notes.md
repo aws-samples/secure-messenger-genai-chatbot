@@ -43,6 +43,14 @@ You may want to repeat the start procedure after turning debug messages on.
 
 Lookout for error messages during startup.
 
+Check the Wickr IO integration log directory
+```shell
+sudo su
+cd /opt/WickrIO/clients/<wickr bot user ID>/integration/<wickr bot user ID>/logs/
+tail -f log.output
+```
+
+
 The following is an example for an incorrect configured Wickr client account - aka "bot" account (see also [Create Wickr IO client account](./README.md#create-wickr-io-client-account)):
 ```shell
 ...
@@ -163,13 +171,6 @@ Check the content of software.tar.gz file:
 ```shell
 aws s3 cp "s3://$s3_bucket_name/wickrio-integrations/genai-advisor-bot/software.tar.gz" software.tar.gz
 tar -tvf software.tar.gz
-```
-
-Get to the Wickr IO integration log directory
-```shell
-sudo su
-cd /opt/WickrIO/clients/genai-advisor-bot/integration/genai-advisor-bot/logs/
-tail -f log.output
 ```
 
 ## Interacting with the AWS GenAI Chatbot API

@@ -1,9 +1,9 @@
-import {getGraphqlApiDefinition, getCognitoUser, region} from "./config.js";
-import {getIdToken} from "./cognito.js"
-import {GraphQlClient} from "./graphql.js";
+import {getGraphqlApiDefinition, getCognitoUser, region} from "./config.mjs";
+import {getIdToken} from "./cognito.mjs"
+import {GraphQlClient} from "./graphql.mjs";
 
 
-class ChatbotClient {
+export default class ChatbotClient {
     constructor(config) {
         this.config = config;
         this.graphqlApiDefinition = null;
@@ -77,5 +77,3 @@ function createRequest(text, sessionId, modelName, provider, workspaceId) {
         }
     }
 }
-
-export {ChatbotClient};

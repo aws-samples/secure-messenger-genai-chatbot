@@ -73,18 +73,20 @@ class CognitoUser(Construct):
             on_event_handler=event_handler_fn,
         )
         genai_stack_params = utils.get_genai_stack_params(genai_chatbot_params.GEN_AI_CHATBOT_STACK_NAME)
-        genai_stack_params.websocket_endpoint = utils.get_websocket_endpoint(genai_chatbot_params.GEN_AI_CHATBOT_STACK_NAME)
+        # genai_stack_params.websocket_endpoint = utils.get_websocket_endpoint(genai_chatbot_params.GEN_AI_CHATBOT_STACK_NAME)
         cdk.CustomResource(
             self, 'Custom resource - Cognito user',
             service_token=cr_provider.service_token,
             properties={
                 'WickrUserName': params.wickrio_config.bot_user_id,
                 'EmailDomain': genai_chatbot_params.GEN_AI_CHATBOT_COGNITO_USER_EMAIL_DOMAIN,
+                # TODO: verify required parameters
                 'AuthenticationUserPoolWebClientId': genai_stack_params.user_pool_web_client_id,
                 'AuthenticationUserPoolId': genai_stack_params.user_pool_id,
-                'ChatBotApiRestApiChatBotApiEndpoint': genai_stack_params.websocket_endpoint,
+                # 'ChatBotApiRestApiChatBotApiEndpoint': genai_stack_params.websocket_endpoint,
             },
         )
+        # TODO: verify required parameters
         self.wickrio_cognito_config = ssm.StringParameter(
             self, 'Parameter - Cognito user',
             parameter_name='/Wickr-GenAI-Chatbot/wickr-io-cognito-config',
@@ -92,7 +94,7 @@ class CognitoUser(Construct):
                 {
                     'user_pool_web_client_id': genai_stack_params.user_pool_web_client_id,
                     'user_pool_id': genai_stack_params.user_pool_id,
-                    'chat_bot_websocket_endpoint': genai_stack_params.websocket_endpoint,
+                    # 'chat_bot_websocket_endpoint': genai_stack_params.websocket_endpoint,
                 }
             )
         )
