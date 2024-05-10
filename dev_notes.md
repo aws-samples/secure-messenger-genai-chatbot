@@ -4,6 +4,14 @@ This document contains a loose collection of notes, command line examples and co
 document is to help during development and troubleshooting by serving as a quick references and to aid copy and 
 paste of often used commands.
 
+## Remote access to EC2 instance
+
+Deploy with `EC2InstanceConnectEndpoint` and `SSHEnablement` constructs. Then open a tunnel via Instance Connection Endpoint:
+```shell
+aws ec2-instance-connect open-tunnel --instance-id insertEC2instanceIDhere --remote-port 22 --local-port 5555
+```
+You can now connect to the EC2 instance via SSH using `localhost:5555`.
+
 ## Troubleshooting the WickrIO start process
 
 Connect to the console of the EC2 instance that runs the WickrIO container via SSM Session Manager (EC2 AWS console).
@@ -46,8 +54,8 @@ Lookout for error messages during startup.
 Check the Wickr IO integration log directory
 ```shell
 sudo su
-cd /opt/WickrIO/clients/<wickr bot user ID>/integration/<wickr bot user ID>/logs/
-tail -f log.output
+cd /opt/WickrIO/clients/<wickr bot user ID>/integration/<wickr bot user ID>/
+tail -f wpm2.output
 ```
 
 

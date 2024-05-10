@@ -2,6 +2,7 @@
 
 import os.path
 
+import aws_cdk as cdk
 from aws_cdk import (
     aws_ec2 as ec2,
     aws_iam as iam,
@@ -75,6 +76,9 @@ class EC2Instance(Construct):
         self.ec2_instance.user_data.add_commands(
             open(os.path.join(os.path.dirname(__file__), 'assets', 'setup.sh')).read()
         )
+
+        # Output EC2 instance ID
+        cdk.CfnOutput(self, 'EC2 Instance ID', value=self.ec2_instance.instance_id)
 
         # ----------------------------------------------------------------
         #       cdk_nag suppressions

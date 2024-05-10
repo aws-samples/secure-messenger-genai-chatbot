@@ -50,7 +50,7 @@ class GraphQlClient {
                 Authorization: this.jwtToken,
             }
         }).then(async (data) => {
-            console.log(JSON.stringify(await data.json(), null, 4));
+            console.log("GraphQL - sendQuery response received")
         });
     }
 }
@@ -69,7 +69,6 @@ function handleConnectionAck() {
 
 function handleData(data) {
     console.log("GraphQL - data received.");
-    console.log("data: ", JSON.stringify(data, null, 4));
 }
 
 function handleKa() {
@@ -82,7 +81,7 @@ function handleStartAck() {
 
 function handleError(message) {
     console.log("GraphQL - error received.");
-    console.log("error: ", JSON.stringify(message, null, 4));
+    console.error("error: ", JSON.stringify(message, null, 4));
 }
 
 function handleUnknownMessage(message) {
