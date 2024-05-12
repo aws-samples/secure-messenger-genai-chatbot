@@ -6,6 +6,7 @@
   "author": "steditt",
   "license": "MIT-0",
   "scripts": {
+    "build": "tsc",
     "start": "nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
     "stop": "kill $(cat $(cat pidLocation.json))",
     "restart": "kill $(cat $(cat pidLocation.json)) && nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
@@ -34,6 +35,8 @@
   },
   "keywords": [],
   "devDependencies": {
-    "jest": ">=29.7.0"
+    "@types/ws": "^8.5.10",
+    "jest": ">=29.7.0",
+    "typescript": "^5.4.5"
   }
 }

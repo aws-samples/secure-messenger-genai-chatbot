@@ -2,14 +2,12 @@ import {openWebsocket} from "./websocket.mjs";
 import fetch from "node-fetch";
 
 class GraphQlClient {
-    constructor(region, wsUri, gqlUri, hostname, jwtToken, handleQqlData) {
+    constructor(region, wsUri, gqlUri, hostname, jwtToken) {
         this.region = region;
         this.wsUri = wsUri;
         this.gqlUri = gqlUri;
         this.hostname = hostname;
         this.jwtToken = jwtToken;
-        this.websocket = null;
-        if (handleQqlData) gqlMsgHandlers.data = handleQqlData;
     }
 
     async initWebsocket() {
@@ -17,41 +15,34 @@ class GraphQlClient {
             this.wsUri, this.hostname, this.jwtToken, dispatchMessage);
     }
 
-    async initGraphqlConnection() {
+    async initGraphqlSubscription() {
         await this.initWebsocket();
         this.websocket.send(JSON.stringify({
             type: "connection_init",
         }));
     }
 
-    async subscribe(sessionId, query) {
-        await this.initGraphqlConnection();
+    async subscribe(sessionId, query, handleQqlData) {
+        if (handleQqlData) gqlMsgHandlers.data = handleQqlData;
+        await this.initGraphqlSubscription();
         this.websocket.send(createSubscriptionRegistrationMsg(sessionId, query, this.hostname, this.jwtToken));
     }
 
-    async sendQuery(request) {
-        const requestStr = JSON.stringify(request);
+    async sendQuery(query) {
         fetch(this.gqlUri, {
             method: 'POST',
-            body: JSON.stringify({
-                query: `
-                    mutation MyMutation($data: String!) {
-                        sendQuery(data: $data)
-                    }
-                `,
-                variables: {
-                    data: JSON.stringify(request),
-                },
-            }),
+            body: JSON.stringify(query),
             headers: {
                 'content-type': 'application/json',
                 'aws_appsync_region': this.region,
                 'aws_appsync_authenticationType': "AMAZON_COGNITO_USER_POOLS",
                 Authorization: this.jwtToken,
             }
-        }).then(async (data) => {
-            console.log("GraphQL - sendQuery response received")
-        });
+        })
+            .then((res) => {
+                console.log("first resolve, res.json() = ", res.json());
+            })
+            .then((result) => console.log("second resolve, result = ", result));
     }
 }
 
