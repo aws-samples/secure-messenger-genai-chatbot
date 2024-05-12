@@ -11,37 +11,6 @@ function handleQqlData(data) {
     console.log("content: ", JSON.parse(data.payload.data.receiveMessages.data).data.content);
 }
 
-async function test_subscription_to_chatbot() {
-    // Create a chatbot client and set model, model provider and RAG workspace as default
-    // configuration.
-    const {default: ChatbotClient} = await import('../components/chatbot.mjs');
-    awsChatbot = new ChatbotClient({
-        modelName: "anthropic.claude-v2",
-        provider: "bedrock",
-        workspaceId: "",
-    });
-
-    // create unique ID for the conversation
-    const sessionId1 = uuidv4();
-
-    // Subscribe to receive response messages from AWS GenAI Chatbot.
-    awsChatbot.subscribeChatbotReceiveMsg(sessionId1, (data) => handleQqlData(data));
-
-    // Send message with default configuration.
-    console.log("Sending message with sessionId1 = ", sessionId1);
-    awsChatbot.send(sessionId1, "Where is Berlin?");
-
-    // Send message with different configuration and different session ID.
-    const sessionId2 = uuidv4();
-    awsChatbot.subscribeChatbotReceiveMsg(sessionId2, (data) => handleQqlData(data));
-    console.log("Sending message with sessionId2 = ", sessionId2);
-    awsChatbot.send(sessionId2, "Where is Berlin?", {
-        modelName: "amazon.titan-text-express-v1",
-        provider: "bedrock",
-        workspaceId: "",
-    });
-}
-
 
 async function test_chatbotGraphqlApi() {
     const chatbotApi = await import('../components/chatbot-graphql-api.mjs');
@@ -94,7 +63,6 @@ async function test_chatbotGraphqlApi() {
 
 async function main() {
     await test_chatbotGraphqlApi();
-    // await test_subscription_to_chatbot();
 }
 
 main().then();
