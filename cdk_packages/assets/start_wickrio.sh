@@ -60,9 +60,11 @@ mkdir -p opt/WickrIO
 WICKR_IO_CONTAINER="wickr/bot-cloud:latest"
 docker pull $WICKR_IO_CONTAINER
 AWS_SECRET_NAME=$(eval "aws secretsmanager get-secret-value --region $region --secret-id WickrIO-Config | jq --raw-output .ARN")
+docker stop WickrIOGenAIAssistant && docker remove WickrIOGenAIAssistant
 docker run \
     -e "AWS_SECRET_NAME=$AWS_SECRET_NAME" \
     -e "AWS_DEFAULT_REGION=$region" \
+    -e "AWS_REGION=$region" \
     -e "AWS_S3_INTEGRATIONS_REGION=$region" \
     -e "AWS_S3_INTEGRATIONS_BUCKET=$s3_bucket_name" \
     -e "AWS_S3_INTEGRATIONS_FOLDER=wickrio-integrations" \

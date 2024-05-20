@@ -168,6 +168,12 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
 
+## Contributors
+
+ - [Stefan Dittforth](https://www.linkedin.com/in/stefandittforth/)
+ - [Otto Kruse](https://www.linkedin.com/in/ockruse/)
+ - Charles Chowdhury-Hanscombe
+
 ## Disclaimers
 
 AWS does not represent or warrant that this AWS Content is production ready.  You are 

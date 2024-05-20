@@ -43,6 +43,7 @@ Start container and attach to it:
 docker run \
     -e "AWS_SECRET_NAME=$AWS_SECRET_NAME" \
     -e "AWS_DEFAULT_REGION=$region" \
+    -e "AWS_REGION=$region" \
     -e "AWS_S3_INTEGRATIONS_REGION=$region" \
     -e "AWS_S3_INTEGRATIONS_BUCKET=$s3_bucket_name" \
     -e "AWS_S3_INTEGRATIONS_FOLDER=wickrio-integrations" \

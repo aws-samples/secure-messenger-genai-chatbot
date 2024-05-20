@@ -1,4 +1,4 @@
-import {CognitoIdentityProviderClient, InitiateAuthCommand} from "@aws-sdk/client-cognito-identity-provider";
+const { CognitoIdentityProviderClient, InitiateAuthCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
 const region = process.env.AWS_REGION;
 
@@ -27,4 +27,6 @@ async function getIdToken(cognitoUser) {
     return authResult.AuthenticationResult.IdToken;
 }
 
-export {getIdToken};
+module.exports = {
+    getIdToken
+};

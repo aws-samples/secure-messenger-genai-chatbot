@@ -1,5 +1,5 @@
-import {GetParameterCommand, SSMClient} from "@aws-sdk/client-ssm";
-import {GetSecretValueCommand, SecretsManagerClient} from "@aws-sdk/client-secrets-manager";
+const { GetParameterCommand, SSMClient } = require("@aws-sdk/client-ssm");
+const { GetSecretValueCommand, SecretsManagerClient } = require("@aws-sdk/client-secrets-manager");
 
 
 const GRAPHQL_PARAMETER = "/Wickr-GenAI-Chatbot/chatbot-graphql-api-definition";
@@ -32,4 +32,6 @@ async function getCognitoUser() {
     return {userPoolWebClientId: userPoolWebClientId, user: userId, password: pwd};
 }
 
-export {getGraphqlApiDefinition, getCognitoUser, region};
+module.exports = {
+    getGraphqlApiDefinition, getCognitoUser, region
+};
