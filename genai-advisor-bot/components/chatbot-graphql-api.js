@@ -25,12 +25,12 @@ class ChatbotClient {
         return this;
     }
 
-    send(text, sessionId, config) {
-        return this.sendMessage(
+    async send(text, sessionId, config) {
+        return await this.sendMessage(
             text,
             sessionId,
             config === undefined ? this.config : config
-        )
+        );
     }
 
     post(gqlQuery) {
