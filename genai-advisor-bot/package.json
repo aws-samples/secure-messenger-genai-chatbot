@@ -9,7 +9,8 @@
     "start": "nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
     "stop": "kill $(cat $(cat pidLocation.json))",
     "restart": "kill $(cat $(cat pidLocation.json)) && nohup wpm2 start --no-metrics ./wpm.json >>wpm2.output 2>&1 & echo $! > $(cat pidLocation.json)",
-    "test": "jest"
+    "test": "jest",
+    "test:cov": "jest --coverage"
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",

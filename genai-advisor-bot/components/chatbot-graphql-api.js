@@ -1,6 +1,6 @@
-const { getCognitoUser, getGraphqlApiDefinition, region } = require("./config.js");
-const { getIdToken } = require ("./cognito.js");
-const { AppSyncClient } = require("./appsync.js");
+const {getCognitoUser, getGraphqlApiDefinition, region} = require("./config.js");
+const {getIdToken} = require("./cognito.js");
+const {AppSyncClient} = require("./appsync.js");
 
 
 class ChatbotClient {
@@ -56,39 +56,11 @@ class ChatbotClient {
         });
     }
 
-    listRagEngines() {
-        return this.post({
-            query: `
-            query MyQuery {
-              listRagEngines {
-                    enabled
-                    id
-                    name
-              }
-            }
-        `,
-        });
-    }
-
     listWorkspaces() {
         return this.post({
             query: `
             query MyQuery {
                 listWorkspaces {
-                    name
-                }
-            }
-        `,
-        });
-    }
-
-    listKendraIndexes() {
-        return this.post({
-            query: `
-            query MyQuery {
-                listKendraIndexes {
-                    external
-                    id
                     name
                 }
             }
@@ -150,4 +122,6 @@ function createQueryData(text, sessionId, modelName, provider, workspaceId) {
 }
 
 
-module.exports = { ChatbotClient };
+module.exports = {
+    ChatbotClient
+};
