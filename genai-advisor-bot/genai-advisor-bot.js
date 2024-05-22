@@ -120,7 +120,7 @@ async function listen(rMessage) { // starts a listener. Message payload accessib
     const parsedMessage = bot.parseMessage(rMessage);
     const vGroupID = parsedMessage.vgroupid;
     if (parsedMessage.message) {
-        const cmdResp = await commands.processCommand(parsedMessage.message);
+        const cmdResp = await commands.processCommand(parsedMessage.message, vGroupID);
         if (cmdResp) {
             console.log('responding to command input');
             await WickrIOAPI.cmdSendRoomMessage(vGroupID, cmdResp.message, "", "", "", [], cmdResp.metaMessage);

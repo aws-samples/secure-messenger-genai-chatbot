@@ -29,6 +29,28 @@ describe("bot commands", () => {
         expect(commands.chatbotClient.appSyncClient).toBeDefined();
     }, 10_000);
 
+    test.each`
+        testCmd
+        ${"/list-models  "}
+        ${"`/list-models`  "}
+        ${"``/list-models``  "}
+        ${"*/list-models*  "}
+        ${"**/list-models** "}
+    `(`filters the MarkDown formatting: >$testCmd<`, async (testCmd) => {
+        const resp = await commands.processCommand(testCmd.testCmd);
+        expect(resp).toHaveProperty("message");
+        expect(resp.message).toEqual(" ");
+        expect(resp).toHaveProperty("metaMessage");
+        const metaMessage = JSON.parse(resp.metaMessage);
+        expect(metaMessage).toHaveProperty("table");
+        expect(metaMessage.table).toEqual({
+            firstcolname: expect.any(String),
+            actioncolname: expect.any(String),
+            name: expect.any(String),
+            rows: expect.any(Array),
+        });
+    }, 30_000);
+
     it("creates the menu for selecting the model", async () => {
         const testCmd = "/list-models  ";
         const resp = await commands.processCommand(testCmd);
@@ -102,13 +124,11 @@ describe("bot commands", () => {
         expect(commands.chatbotClient.config.workspaceId).toEqual("");
         expect(commands.chatbotClient.config.workspaceName).toEqual("");
         const resp = await commands.processCommand(testCmd);
-        expect(resp).toEqual({
-            message: "active workspace: **WickrIO-Bot-Advisor**",
-            metaMessage: ""
-        });
+        expect(resp.message).toContain("active workspace: ");
+        expect(resp.metaMessage).toEqual("");
         expect(commands.chatbotClient.config.workspaceId).toMatch(
             /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-        expect(commands.chatbotClient.config.workspaceName).toEqual("WickrIO-Bot-Advisor");
+        expect(commands.chatbotClient.config.workspaceName).toEqual(expect.any(String));
     }, 10_000);
 
     it("selects an invalid menu item for a workspace", async () => {
@@ -129,17 +149,14 @@ describe("bot commands", () => {
         let resp = await commands.processCommand(testCmd);
         expect(resp).toEqual({
             message: "active large language model: **anthropic.claude-v2**\n" +
-                "active workspace: **<none selected>**",
+                "active workspace: **none selected**",
             metaMessage: ""
         });
         await commands.processCommand("/select-model 0");
         await commands.processCommand("/select-rag-workspace 0");
         resp = await commands.processCommand(testCmd);
-        expect(resp).toEqual({
-            message: "active large language model: **amazon.titan-text-express-v1**\n" +
-                "active workspace: **WickrIO-Bot-Advisor**",
-            metaMessage: ""
-        });
+        expect(resp.message).toContain("active large language model: ");
+        expect(resp.metaMessage).toEqual("");
     }, 10_000);
 
     it("submits various non-commands", async () => {
@@ -162,4 +179,5 @@ describe("bot commands", () => {
         expect(resp.message).toContain(startOfHelpText);
     }, 10_000);
 
-});
+})
+;

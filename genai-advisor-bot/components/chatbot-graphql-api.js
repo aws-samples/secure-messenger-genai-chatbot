@@ -65,8 +65,19 @@ class ChatbotClient {
                     name
                 }
             }
-        `,
-        });
+        `});
+    }
+
+    deleteSession(sessionId) {
+        return this.post({
+            query: `
+            mutation MyMutation {
+                deleteSession(id: "${sessionId}") {
+                    id
+                    deleted
+                }
+            }
+        `});
     }
 
     async* responseMessagesListener(sessionId) {

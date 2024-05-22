@@ -4,15 +4,15 @@ class CommandInterpreter {
         this.chatbotClient = chatbotClient;
     }
 
-    processCommand(cmdString) {
-        const regex = /^\/[^\s]+/;
+    processCommand(cmdString, sessionId) {
+        const regex = /^[`*]{0,2}\/\S+/;
         if (regex.test(cmdString)) {
-            return this.command(cmdString);
+            return this.command(cmdString, sessionId);
         }
         return false;
     }
 
-    async command(cmdString) {
+    async command(cmdString, sessionId) {
         const validCommands = [
             ["/list-models", this.cmdListModels],
             ["/list-rag-workspaces", this.cmdListRagWorkspaces],
@@ -20,10 +20,12 @@ class CommandInterpreter {
             ["/select-rag-workspace", this.cmdSelectRagWorkspace],
             ["/current-config", this.cmdShowCurrent]
         ];
+        let cleanCmdStr = cmdString.trim();
+        cleanCmdStr = cleanCmdStr.replace(/^[`*]+|[`*]+$/g, "");  // remove MarkDown formatting
         for (const [token, cmdFunc] of validCommands) {
-            const start = cmdString.trim().indexOf(token);
+            const start = cleanCmdStr.indexOf(token);
             if (start >= 0) {
-                return await cmdFunc(cmdString.substring(start + token.length));
+                return await cmdFunc(cleanCmdStr.substring(start + token.length), sessionId);
             }
         }
         // if no valid command, respond with help text
@@ -46,7 +48,7 @@ class CommandInterpreter {
         };
     }
 
-    cmdSelectModel = async (cmdString) => {
+    cmdSelectModel = async (cmdString, sessionId) => {
         const models = await this.menuModels();
         const index = parseInt(cmdString.trim());
         if (index < 0 || index >= models.table.rows.length) {
@@ -57,6 +59,11 @@ class CommandInterpreter {
         }
         const selectedModel = models.providers[index].modelName;
         const provider = models.providers[index].provider;
+        if (this.chatbotClient.config.modelName !== selectedModel ||
+            this.chatbotClient.config.provider !== provider) {
+            const resp = await this.chatbotClient.deleteSession(sessionId);
+            console.log("chatbot session delete: " + JSON.stringify(resp.data.deleteSession));
+        }
         this.chatbotClient.config.modelName = selectedModel;
         this.chatbotClient.config.provider = provider;
         return {
@@ -65,7 +72,7 @@ class CommandInterpreter {
         };
     }
 
-    cmdSelectRagWorkspace = async (cmdString) => {
+    cmdSelectRagWorkspace = async (cmdString, sessionId) => {
         const workspaces = await this.menuWorkspaces();
         const index = parseInt(cmdString.trim());
         if (index < 0 || index >= workspaces.table.rows.length) {
@@ -76,10 +83,15 @@ class CommandInterpreter {
         }
         const workspaceName = workspaces.workspaces[index].name;
         const workspaceId = workspaces.workspaces[index].id;
+        if (this.chatbotClient.config.workspaceName !== workspaceName ||
+            this.chatbotClient.config.workspaceId !== workspaceId) {
+            const resp = await this.chatbotClient.deleteSession(sessionId);
+            console.log("chatbot session delete: " + JSON.stringify(resp.data.deleteSession));
+        }
         this.chatbotClient.config.workspaceName = workspaceName;
         this.chatbotClient.config.workspaceId = workspaceId;
         return {
-            message: "active workspace: **" + workspaceName + "**",
+            message: "active workspace: **" + (workspaceName === "" ? "none selected" : workspaceName) + "**",
             metaMessage: ""
         };
     }
@@ -87,7 +99,7 @@ class CommandInterpreter {
     cmdShowCurrent = () => {
         return {
             message: "active large language model: **" + this.chatbotClient.config.modelName + "**\n" +
-                "active workspace: **" + (this.chatbotClient.config.workspaceName === "" ? "<none selected>" : this.chatbotClient.config.workspaceName) + "**",
+                "active workspace: **" + (this.chatbotClient.config.workspaceName === "" ? "none selected" : this.chatbotClient.config.workspaceName) + "**",
             metaMessage: ""
         };
     }
@@ -95,9 +107,9 @@ class CommandInterpreter {
     cmdHelp = () => {
         return {
             message: "You can use the following commands:\n\n" +
-                "/list-models - list available large language models\n" +
-                "/list-rag-workspaces - list available RAG workspaces\n" +
-                "/current-config - show current configuration",
+                "`/list-models` - list available large language models\n" +
+                "`/list-rag-workspaces` - list available RAG workspaces\n" +
+                "`/current-config` - show current configuration",
             metaMessage: ""
         };
     }
@@ -133,7 +145,6 @@ class CommandInterpreter {
         let workspaceNames = [];
         let workspaces = [];
         for (const [index, workspace] of data.data.listWorkspaces.entries()) {
-            if (workspace.name.length === 0) continue;
             workspaceNames.push({
                 firstcolvalue: workspace.name,
                 response: "/select-rag-workspace " + index,
@@ -143,6 +154,15 @@ class CommandInterpreter {
                 id: workspace.id,
             });
         }
+        // add an option to select "none"
+        workspaceNames.push({
+            firstcolvalue: "none",
+            response: "/select-rag-workspace " + workspaceNames.length,
+        });
+        workspaces.push({
+            name: "",
+            id: "",
+        });
         return {
             table: {
                 name: 'List of Workspaces',

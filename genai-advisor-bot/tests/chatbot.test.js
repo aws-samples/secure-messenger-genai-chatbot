@@ -19,19 +19,17 @@ describe("communication with LLM chatbot", () => {
 
     it("sends a message and waits for a response", async () => {
         const sessionId = uuidv4();
-        const myModule = {
-            async returnMessageHandler(messageIterator) {
-                const message = await messageIterator.next();
-                const data = JSON.parse(message.value.receiveMessages.data);
-                expect(data.data.sessionId).toEqual(sessionId);
-                expect(data.data.content).toContain("Berlin");
-                expect(data.data.content).toContain("Germany");
-                expect(data.data.content).toContain("capital");
-            }
-        };
 
-        const returnMessageHandlerSpy = jest.spyOn(myModule, 'returnMessageHandler');
-        const responseHandlerPromise = myModule.returnMessageHandler(
+        async function returnMessageHandler(messageIterator) {
+            const message = await messageIterator.next();
+            const data = JSON.parse(message.value.receiveMessages.data);
+            expect(data.data.sessionId).toEqual(sessionId);
+            expect(data.data.content).toContain("Berlin");
+            expect(data.data.content).toContain("Germany");
+            expect(data.data.content).toContain("capital");
+        }
+
+        const responseHandlerPromise = returnMessageHandler(
             chatbotClient.responseMessagesListener(sessionId)
         );
         const resp = await chatbotClient.send("Where is Berlin?", sessionId);
@@ -41,21 +39,48 @@ describe("communication with LLM chatbot", () => {
         await responseHandlerPromise;
     }, 20_000);
 
+    it("deletes a chatbot conversation session", async () => {
+        const sessionId = uuidv4();
+
+        async function returnMessageHandler(messageIterator) {
+            const message = await messageIterator.next();
+            const data = JSON.parse(message.value.receiveMessages.data);
+            expect(data.data.sessionId).toEqual(sessionId);
+            expect(data.data.content).toContain("Berlin");
+            expect(data.data.content).toContain("Germany");
+            expect(data.data.content).toContain("capital");
+        }
+
+        const responseHandlerPromise = returnMessageHandler(
+            chatbotClient.responseMessagesListener(sessionId)
+        );
+        let resp = await chatbotClient.send("Where is Berlin?", sessionId);
+        expect(resp).toHaveProperty("data");
+        expect(resp.data).toEqual({sendQuery: expect.any(String)});
+        expect(resp.data.sendQuery).toContain("HTTPStatusCode=200");
+        await responseHandlerPromise;
+        resp = await chatbotClient.deleteSession(sessionId);
+        expect(resp).toHaveProperty("data");
+        expect(resp.data.deleteSession).toEqual({
+            id: sessionId,
+            deleted: true,
+        });
+    }, 20_000);
+
     it("sends a message with a different configuration", async () => {
         const model = "amazon.titan-text-express-v1";
         const sessionId = uuidv4();
-        const myModule = {
-            async returnMessageHandler(messageIterator) {
-                const message = await messageIterator.next();
-                const data = JSON.parse(message.value.receiveMessages.data);
-                expect(data.data.sessionId).toEqual(sessionId);
-                expect(data.data.content).toContain("United Arab Emirates");
-                expect(data.data.content).toContain("Abu Dhabi");
-                expect(data.data.content).toContain("capital");
-            }
-        };
-        const returnMessageHandlerSpy = jest.spyOn(myModule, "returnMessageHandler");
-        const responseHandlerPromise = myModule.returnMessageHandler(
+
+        async function returnMessageHandler(messageIterator) {
+            const message = await messageIterator.next();
+            const data = JSON.parse(message.value.receiveMessages.data);
+            expect(data.data.sessionId).toEqual(sessionId);
+            expect(data.data.content).toContain("United Arab Emirates");
+            expect(data.data.content).toContain("Abu Dhabi");
+            expect(data.data.content).toContain("capital");
+        }
+
+        const responseHandlerPromise = returnMessageHandler(
             chatbotClient.responseMessagesListener(sessionId)
         );
         const resp = await chatbotClient.send(
