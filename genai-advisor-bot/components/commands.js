@@ -74,10 +74,12 @@ class CommandInterpreter {
                 metaMessage: ""
             };
         }
-        const selectedWorkspace = workspaces.table.rows[index].firstcolvalue;
-        this.chatbotClient.config.workspaceId = selectedWorkspace;
+        const workspaceName = workspaces.workspaces[index].name;
+        const workspaceId = workspaces.workspaces[index].id;
+        this.chatbotClient.config.workspaceName = workspaceName;
+        this.chatbotClient.config.workspaceId = workspaceId;
         return {
-            message: "active workspace: **" + selectedWorkspace + "**",
+            message: "active workspace: **" + workspaceName + "**",
             metaMessage: ""
         };
     }
@@ -85,7 +87,7 @@ class CommandInterpreter {
     cmdShowCurrent = () => {
         return {
             message: "active large language model: **" + this.chatbotClient.config.modelName + "**\n" +
-                "active workspace: **" + (this.chatbotClient.config.workspaceId === "" ? "<none selected>" : this.chatbotClient.config.workspaceId) + "**",
+                "active workspace: **" + (this.chatbotClient.config.workspaceName === "" ? "<none selected>" : this.chatbotClient.config.workspaceName) + "**",
             metaMessage: ""
         };
     }
@@ -128,24 +130,29 @@ class CommandInterpreter {
 
     async menuWorkspaces() {
         const data = await this.chatbotClient.listWorkspaces();
-        const workspaces = data.data.listWorkspaces.filter(function (workspace) {
-            return workspace.name.length !== 0
-        }).map(function (workspace, index) {
-            return {
+        let workspaceNames = [];
+        let workspaces = [];
+        for (const [index, workspace] of data.data.listWorkspaces.entries()) {
+            if (workspace.name.length === 0) continue;
+            workspaceNames.push({
                 firstcolvalue: workspace.name,
                 response: "/select-rag-workspace " + index,
-            }
-        });
+            });
+            workspaces.push({
+                name: workspace.name,
+                id: workspace.id,
+            });
+        }
         return {
             table: {
                 name: 'List of Workspaces',
                 firstcolname: 'Workspace',
                 actioncolname: 'Select',
-                rows: workspaces,
+                rows: workspaceNames,
             },
+            workspaces: workspaces
         }
     }
-
 }
 
 

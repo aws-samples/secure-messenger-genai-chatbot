@@ -23,6 +23,7 @@ describe("Cognito user authentication - invalid credentials", () => {
                 provider: "bedrock",
                 workspaceId: "",
             }).ready();
+            expect(chatbotClient).toBeUndefined();
         } catch (error) {
             expect(error.name).toEqual("ResourceNotFoundException");
         }

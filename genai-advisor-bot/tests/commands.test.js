@@ -12,6 +12,7 @@ describe("bot commands", () => {
             await new ChatbotClient({
                 modelName: "anthropic.claude-v2",
                 provider: "bedrock",
+                workspaceName: "",
                 workspaceId: "",
             }).ready()
         );
@@ -22,6 +23,7 @@ describe("bot commands", () => {
         expect(commands.chatbotClient.config).toEqual({
             modelName: "anthropic.claude-v2",
             provider: "bedrock",
+            workspaceName: "",
             workspaceId: "",
         });
         expect(commands.chatbotClient.appSyncClient).toBeDefined();
@@ -98,23 +100,28 @@ describe("bot commands", () => {
     it("selects a valid workspace", async () => {
         const testCmd = "/select-rag-workspace 0";
         expect(commands.chatbotClient.config.workspaceId).toEqual("");
+        expect(commands.chatbotClient.config.workspaceName).toEqual("");
         const resp = await commands.processCommand(testCmd);
         expect(resp).toEqual({
             message: "active workspace: **WickrIO-Bot-Advisor**",
             metaMessage: ""
         });
-        expect(commands.chatbotClient.config.workspaceId).toEqual("WickrIO-Bot-Advisor");
+        expect(commands.chatbotClient.config.workspaceId).toMatch(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+        expect(commands.chatbotClient.config.workspaceName).toEqual("WickrIO-Bot-Advisor");
     }, 10_000);
 
     it("selects an invalid menu item for a workspace", async () => {
         const testCmd = "/select-rag-workspace 994";
         expect(commands.chatbotClient.config.workspaceId).toEqual("");
+        expect(commands.chatbotClient.config.workspaceName).toEqual("");
         const resp = await commands.processCommand(testCmd);
         expect(resp).toEqual({
             message: "invalid menu item selected: 994",
             metaMessage: ""
         });
         expect(commands.chatbotClient.config.workspaceId).toEqual("");
+        expect(commands.chatbotClient.config.workspaceName).toEqual("");
     }, 10_000);
 
     it("requests the current configuration", async () => {

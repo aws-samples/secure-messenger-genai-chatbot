@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT-0
 
 const WickrIOAPI = require('wickrio_addon');
-const { WickrIOBot, logger } = require('wickrio-bot-api');
+const {WickrIOBot, logger} = require('wickrio-bot-api');
 const fs = require('fs');
 const util = require('util');
 
-const { ChatbotClient } = require("./components/chatbot-graphql-api");
-const { CommandInterpreter } = require('./components/commands.js');
+const {ChatbotClient} = require("./components/chatbot-graphql-api");
+const {CommandInterpreter} = require('./components/commands.js');
 
 
 console.log = function () {
@@ -27,6 +27,7 @@ let commands;
 const defaultConfig = {
     modelName: "anthropic.claude-v2",
     provider: "bedrock",
+    workspaceName: "",
     workspaceId: "",
 };
 
@@ -100,40 +101,40 @@ async function returnMessageHandler(messageIterator) {
     for await (const message of await messageIterator) {
         console.log("returnMessageHandler() - response from chatbot GraphQL subscription received.");
         const data = JSON.parse(message.receiveMessages.data);
-    }
-    try {
-        const resp = await WickrIOAPI.cmdSendRoomMessage(
-            data.data.sessionId.toString(),
-            data.data.content.toString(),
-        );
-        console.log(`WickrIOAPI resp = ${JSON.stringify(resp, null, 4)}`);
-    } catch (err) {
-        console.error('Error sending message back to Wickr client.');
-        console.error(err);
+        try {
+            const resp = await WickrIOAPI.cmdSendRoomMessage(
+                data.data.sessionId.toString(),
+                data.data.content.toString(),
+            );
+            console.log(`WickrIOAPI resp = ${JSON.stringify(resp, null, 4)}`);
+        } catch (err) {
+            console.error('Error sending message back to Wickr client.');
+            console.error(err);
+        }
     }
 }
 
 
 async function listen(rMessage) { // starts a listener. Message payload accessible as 'message'
-    console.log('entered listen()')
+    console.log('entered listen()');
     const parsedMessage = bot.parseMessage(rMessage);
     const vGroupID = parsedMessage.vgroupid;
     if (parsedMessage.message) {
         const cmdResp = await commands.processCommand(parsedMessage.message);
         if (cmdResp) {
+            console.log('responding to command input');
             await WickrIOAPI.cmdSendRoomMessage(vGroupID, cmdResp.message, "", "", "", [], cmdResp.metaMessage);
         } else {
             if (!activeVGroupIDs.includes(vGroupID)) {
                 activeVGroupIDs.push(vGroupID);
                 console.log("creating response message iterator");
-                // const messageIterator = chatbotApi.responseMessagesListener(vGroupID);
-                // returnMessageHandler(messageIterator).then(() => {
-                //     console.log("returnMessageHandler().then()");
-                // });
-                // }
+                const messageIterator = awsChatbot.responseMessagesListener(vGroupID);
+                returnMessageHandler(messageIterator).then(() => {
+                    console.log("returnMessageHandler().then()");
+                });
             }
             console.log("sending message to chatbot API");
-            awsChatbot.send(vGroupID, parsedMessage.message);
+            awsChatbot.send(parsedMessage.message, vGroupID);
         }
     }
 }
