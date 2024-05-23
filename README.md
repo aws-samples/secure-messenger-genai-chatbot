@@ -5,15 +5,15 @@ with the [AWS GenAI LLM Chatbot](https://github.com/aws-samples/aws-genai-llm-ch
 Chatbot is an open source project for experimenting with a variety of large Language models (LLM) and multimodal 
 language models, settings and prompts in your own AWS account.
 
-Furthermore, the project serves as an examples for a fully automated deployment of the Wickr IO docker container and 
+Furthermore, the project serves as an example for a fully automated deployment of the Wickr IO docker container and 
 the integration code. The deployment utilizes the [AWS Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). For 
 guidance for developing your own Wickr IO integrations, please refer to the [Wickr IO documentation](https://wickrinc.github.io/wickrio-docs/#wickr-io).
 
 [<p align="center"><img src="doc/UI-screenshot.png" width="1000" /></p>]()
 
 The AWS GenAI LLM Chatbot solution provides a convenient user interface to select LLMs and create workspaces for
-[retrieval-augmented generation (RAG)](https://aws.amazon.com/what-is/retrieval-augmented-generation/). The Wickr IO 
-integration code communicates with the websocket API of the AWS GenAI LLM Chatbot to retrieve responses for messages 
+[retrieval-augmented generation (RAG)](https://aws.amazon.com/what-is/retrieval-augmented-generation/). RAG is a technology to augment LLMs with additional knowledge sources. 
+The Wickr IO integration code communicates with the API of the AWS GenAI LLM Chatbot to retrieve responses for messages 
 send via the Wickr messenger.
 
 ## Architecture
@@ -27,7 +27,7 @@ first. See also section [Prequisites](#prerequisites).
 the EC2 instance with the Wickr IO docker container is placed in a private subnet. Communication to the Wickr service
 is through a NAT gateway.
 2. The project makes use of the Wickr IO feature to pull the configuration information from AWS Secrets Manager and to 
-to pull the custom integration code from S3. Configuration and code is pulled at startup of the Wickr IO docker 
+pull the custom integration code from S3. Configuration and code is pulled at startup of the Wickr IO docker 
 container. For more information please see the Wickr IO documentation [Automatic Configuration](https://wickrinc.github.io/wickrio-docs/#automatic-configuration).
 3. Access to the Secret that holds the Wickr IO configuration and the custom integration code in S3, is controlled via an 
 IAM user. The IAM credentials are stored in AWS Secrets Manager and rotated automatically on a regular basis 
@@ -45,66 +45,46 @@ user pool of the AWS GenAI LLM Chatbot solution. The password for this user is s
 automatically on a regular basis.
 6. After deployment, the user uses the Wickr client software to initiate a conversation with the Wickr IO bot user. Then,
 the custom integration code running in the Wickr IO docker container authenticates to the AWS GenAI LLM Chatbot using
-the Cognito user. After successful authentication, messages are exchanged via the websocket channel.
+the Cognito user. After successful authentication, messages are exchanged via the AppSync GraphQL API.
 
 ## Prerequisites
 
-### Deployment of the AWS GenAI LLM Chatbot
+### Deploy the AWS GenAI LLM Chatbot
 
 This project is dependent on a successful deployment and configuration of the [AWS GenAI LLM Chatbot](https://github.com/aws-samples/aws-genai-llm-chatbot)
-solution. Please follow the instructions below before deploying the Wickr IO and AWS GenAI Chatbot integration 
+solution. Please follow the instructions below before deploying the Wickr IO integration 
 (described in section [Deployment](#deployment)).
 
 1. Follow the instructions outlined in the [Deploy](https://aws-samples.github.io/aws-genai-llm-chatbot/guide/deploy.html#aws-cloud9) section
 of the AWS GenAI LLM Chatbot solution.
-2. During selection of the features, ensure you select the "Llama2_13b_Chat" SageMaker model:
+2. During selection of the features with `npm run config`, the following configuration is suggested:
 ```shell
-...
-? Which SageMaker Models do you want to enable …  SPACE to select, ENTER to confirm selection [denotes instance size to host model]
-...
-✔ Llama2_13b_Chat [ml.g5.12xlarge]
-...
+✔ Prefix to differentiate this deployment · 
+✔ Do you want to use existing vpc? (selecting false will create a new vpc) (y/N) · false
+✔ Do you want to deploy a private website? I.e only accessible in VPC (y/N) · false
+✔ Do you want to provide a custom domain name and corresponding certificate arn for the public website ? (y/N) · false
+✔ Do want to restrict access to the website (CF Distribution) to only a country or countries? (y/N) · false
+✔ Do you have access to Bedrock and want to enable it (Y/n) · true
+✔ Region where Bedrock is available · us-east-1
+✔ Cross account role arn to invoke Bedrock - leave empty if Bedrock is in same account · 
+✔ Do you want to use any Sagemaker Models (y/N) · false
+✔ Do you want to enable RAG (Y/n) · true
+✔ Which datastores do you want to enable for RAG · opensearch
+✔ Select a default embedding model · cohere.embed-multilingual-v3
 ```
-3. ... and enable RAG and "Kendra (managed)" as data store:
-```shell
-...
-✔ Do you want to enable RAG (y/N) · true
-? Which datastores do you want to enable for RAG …  SPACE to select, ENTER to confirm selection
-...
-✔ Kendra (managed)
-...
-```
-4. After successful deployment, start the web user interface of the AWS GenAI Chatbot and navigate to the "Retrieval-Augmented 
-Generation (RAG)" menu and select "Workspaces". Create a new Amazon Kendra workspace with the name 
-"WickrIO-Bot-Advisor". Please use exactly this name. The Wickr IO integration uses this name to select a RAG 
-workspace.
 
-[<p align="center"><img src="doc/RAG-workspace.png" width="1000" /></p>]()
+### Create the Wickr IO client account
 
-4. You can now upload documents to the "WickrIO-Bot-Advisor" workspace. These documents will be references by the LLM 
-as an authoritative knowledge base outside its training data sources before generating a response. If you wish to
-recreate the response shown in the [Introduction](#introduction) section, use this document: [AposHealth for knee osteoarthritis](https://www.nice.org.uk/guidance/mtg76).
-This document provides evidence-based recommendations for healthcare practitioners related to knee osteoarthritis. It
-serves as an example for specialised knowledge that was not part of the data sources when training an LLM.
+The Wickr IO integration code requires a Wickr client account - aka "bot" account. Please 
+create the Wickr client account follow the instructions in the Wickr IO guide, 
+[section "Wickr IO Client Creation"](https://wickrinc.github.io/wickrio-docs/#configuration-wickr-io-client-creation). Store user ID and password you just created in a 
+password safe. The information are required in the next section for deployment of the Wickr 
+IO integration.
 
-[<p align="center"><img src="doc/upload-doc.png" width="1000" /></p>]()
-
-5. Don't forget to "Start Kendra Data Sync".
-
-**Reminder:** please make sure you select the "Llama2_13b_Chat" SageMaker model during selection of the features and 
-name the RAG workspace "WickrIO-Bot-Advisor". The Wickr IO integration is dependent on these names to communicate with
-the chatbot backend.
-
-### Create Wickr IO client account
-
-The Wickr IO integration code requires a Wickr client account - aka "bot" account. Please create the Wickr client 
-account follow the instructions in the Wickr IO guide, [section "Wickr IO Client Creation"](https://wickrinc.github.io/wickrio-docs/#configuration-wickr-io-client-creation).
-Store user ID and password you just created in a password safe. The information are required in the next section for 
-deployment of the Wickr IO integration.
-
-IMPORTANT: Do not use the backslash character '\\' in the password for the Wickr IO client account. The automated 
-installation procedure for the WickrIO container reads the password from AWS Secrets Manager. A backslash in the 
-configuration is interpreted as an escape character. This leads to a failing login when the Wickr IO container starts.
+IMPORTANT: Do not use the backslash character ` \ ` in the password for the Wickr IO client 
+account. The automated installation procedure for the WickrIO container reads the password 
+from AWS Secrets Manager. A backslash in the configuration is interpreted as an 
+escape character. This leads to a failing login when the Wickr IO container starts.
 
 [<p align="center"><img src="doc/wickr-io-client-account.png" width="700" /></p>]()
 
@@ -139,7 +119,7 @@ cdk bootstrap
 ```
 
 3. Run the following command to deploy the project. Replace `WickrClientAccount` and `WickrClientPassword` with the 
-user ID and password you created in step [Create Wickr IO client account](#create-wickr-io-client-account). Place the 
+user ID and password you created in step [Create the Wickr IO client account](#Create-the-Wickr-IO-client-account). Place the 
 password in quotation marks.
 ```shell
 cdk deploy --all --context bot_user_id="WickrClientAccount" --context bot_password="WickrClientPassword" --require-approval never --no-prompts
@@ -149,9 +129,18 @@ The deployment takes around 5 minutes to complete.
 
 ## Troubleshooting
 
-In case of issues it is recommended to check the Wickr IO integration code log file for any error messages. The log file
-is written on the EC2 instance that runs the Wickr IO docker container. Use SSM Session Manager to access the console of
-the instance. The log file is written to `/opt/WickrIO/clients/genai-advisor-bot/integration/genai-advisor-bot/logs/`.
+In case of issues it is recommended to check the Wickr IO integration code log files for 
+any error messages. The log files are written on the EC2 instance that runs the Wickr IO 
+docker container. Use SSM Session Manager to access the console of the instance. 
+Check the following logfiles:
+```shell
+/opt/WickrIO/clients/<wickr bot user ID>/integration/<wickr bot user ID>/:
+wpm2.output
+
+/opt/WickrIO/clients/<wickr bot user ID>/integration/<wickr bot user ID>/logs/
+error.output
+log.output
+```
 
 ## Clean up
 
@@ -171,8 +160,8 @@ This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) fil
 ## Contributors
 
  - [Stefan Dittforth](https://www.linkedin.com/in/stefandittforth/)
- - [Otto Kruse](https://www.linkedin.com/in/ockruse/)
  - Charles Chowdhury-Hanscombe
+ - [Otto Kruse](https://www.linkedin.com/in/ockruse/)
 
 ## Disclaimers
 
