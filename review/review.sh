@@ -35,4 +35,7 @@ git clone https://github.com/todogroup/repolinter.git
 cd repolinter/
 npm install -g repolinter
 repolinter --version
-# run repolinter with the ruleset of your choice
+# delete node_modules, cdk.out, __pycache__ folders before running repolinter or do a got clone into a fresh directory
+# run repolinter with the ruleset of your choice i.e.:
+# node <path/to/repolinter>/bin/repolinter.js lint path/to/project -r path/to/amazon-ospo-ruleset.json
+# repolinter lint ./secure-messenger-genai-chatbot -r <pathToRulkeSetFile>

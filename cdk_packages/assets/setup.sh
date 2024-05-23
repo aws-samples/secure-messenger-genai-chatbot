@@ -9,6 +9,8 @@ echo ----- update system -----
 
 apt-get update
 apt-get upgrade -y
+apt clean
+sleep 30s  # allow apt-get to complete, avoid error "Could not get lock /var/lib/dpkg/lock-frontend."
 apt-get install unzip -y
 apt-get install jq -y
 
@@ -62,6 +64,9 @@ aws s3 cp "$s3_object_url" /start_wickrio.sh
 chmod +x /start_wickrio.sh
 echo "@reboot /start_wickrio.sh" >> /var/spool/cron/crontabs/root
 chmod 600 /var/spool/cron/crontabs/root
+
+echo ----- start Wickr IO integration -----
+
 ./start_wickrio.sh
 
 echo -----

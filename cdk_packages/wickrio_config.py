@@ -7,12 +7,8 @@ import aws_cdk as cdk
 from aws_cdk import (
     aws_secretsmanager as secretsmanager,
     SecretValue as SecretValue,
-    aws_logs as logs,
-    aws_lambda as lambda_,
     aws_ssm as ssm,
-    aws_iam as iam,
 )
-from aws_cdk.aws_s3_assets import Asset
 from cdk_nag import NagSuppressions
 from constructs import Construct
 

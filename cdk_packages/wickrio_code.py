@@ -24,7 +24,7 @@ class WickrIOCode(Construct):
 
         source_dir = os.path.join(dirname, '..', 'genai-advisor-bot')
         output_filename = os.path.join(dirname, 'assets', 'software')
-        exclude = ['.idea', 'node_modules', '__tests__']
+        exclude = ['.idea', 'node_modules', '__tests__', 'tests', 'coverage']
         with tarfile.open(f'{output_filename}.tar.gz', 'w:gz') as tar:
             exclude_pattern = f'(?:{"|".join(exclude)})'
             tar.add(
