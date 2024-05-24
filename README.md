@@ -16,36 +16,11 @@ The AWS GenAI LLM Chatbot solution provides a convenient user interface to selec
 The Wickr IO integration code communicates with the API of the AWS GenAI LLM Chatbot to retrieve responses for messages 
 send via the Wickr messenger.
 
-## Architecture
+## End user experience
 
-The CDK code in this project deploys the architecture depicted below. Please note, this project only deploys the Wickr IO components. The AWS GenAI LLM Chatbot solution must be deployed 
-first. See also section [Prequisites](#prerequisites).
+Watch the video below to get an impression of the user experience first before deploying the project.
 
-[<p align="center"><img src="doc/architecture.png" width="800" /></p>]()
-
-1. Following guideline [SEC05-BP01 Create network layers](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_network_protection_create_layers.html),
-the EC2 instance with the Wickr IO docker container is placed in a private subnet. Communication to the Wickr service
-is through a NAT gateway.
-2. The project makes use of the Wickr IO feature to pull the configuration information from AWS Secrets Manager and to 
-pull the custom integration code from S3. Configuration and code is pulled at startup of the Wickr IO docker 
-container. For more information please see the Wickr IO documentation [Automatic Configuration](https://wickrinc.github.io/wickrio-docs/#automatic-configuration).
-3. Access to the Secret that holds the Wickr IO configuration and the custom integration code in S3, is controlled via an 
-IAM user. The IAM credentials are stored in AWS Secrets Manager and rotated automatically on a regular basis 
-([SEC02-BP05 Audit and rotate credentials periodically](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_identities_audit.html)).
-After a secret rotation, the EC2 instance needs to be rebooted. 
-The IAM user's AWS access key ID and secret access key are installed in the `~/.aws` directory on the EC2 instance 
-at reboot.
-4. The Wickr IO custom integration code requires a Wickr IO bot user in order to communicate with the Wickr 
-service (see also the Wickr IO documentation [Wickr IO Client Creation](https://wickrinc.github.io/wickrio-docs/#configuration-wickr-io-client-creation)).
-The Wickr IO bot user credentials are provided during `cdk deploy` via `--context` parameters (see also [Deployment](#deployment)). 
-Please note, the Wickr IO bot user credentials are not rotated automatically. A regular, manual rotation via the Wickr
-admin console is recommended ([Wickr IO Client Creation](https://wickrinc.github.io/wickrio-docs/#configuration-wickr-io-client-creation)). 
-5. For communication with the AWS GenAI LLM Chatbot solution a Cognito user is generated during deployment in the Cognito 
-user pool of the AWS GenAI LLM Chatbot solution. The password for this user is stored in AWS Secrets Manager and rotated
-automatically on a regular basis.
-6. After deployment, the user uses the Wickr client software to initiate a conversation with the Wickr IO bot user. Then,
-the custom integration code running in the Wickr IO docker container authenticates to the AWS GenAI LLM Chatbot using
-the Cognito user. After successful authentication, messages are exchanged via the AppSync GraphQL API.
+https://github.com/aws-samples/secure-messenger-genai-chatbot/assets/149990130/10e31a61-1a7b-4c70-803e-d4c00c07bcac
 
 ## Prerequisites
 
@@ -127,12 +102,6 @@ cdk deploy --all --context bot_user_id="WickrClientAccount" --context bot_passwo
 
 The deployment takes around 5 minutes to complete.
 
-## End user experience
-
-Watch the video below to get an impression of the user experience first before deploying the project.
-
-https://github.com/aws-samples/secure-messenger-genai-chatbot/assets/149990130/10e31a61-1a7b-4c70-803e-d4c00c07bcac
-
 ## Troubleshooting
 
 In case of issues it is recommended to check the Wickr IO integration code log files for 
@@ -154,6 +123,37 @@ All resources are destroyed by running the following command:
 ```shell
 cdk destroy --all
 ```
+
+## Architecture
+
+The CDK code in this project deploys the architecture depicted below. Please note, this project only deploys the Wickr IO components. The AWS GenAI LLM Chatbot solution must be deployed 
+first. See also section [Prequisites](#prerequisites).
+
+[<p align="center"><img src="doc/architecture.png" width="800" /></p>]()
+
+1. Following guideline [SEC05-BP01 Create network layers](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_network_protection_create_layers.html),
+the EC2 instance with the Wickr IO docker container is placed in a private subnet. Communication to the Wickr service
+is through a NAT gateway.
+2. The project makes use of the Wickr IO feature to pull the configuration information from AWS Secrets Manager and to 
+pull the custom integration code from S3. Configuration and code is pulled at startup of the Wickr IO docker 
+container. For more information please see the Wickr IO documentation [Automatic Configuration](https://wickrinc.github.io/wickrio-docs/#automatic-configuration).
+3. Access to the Secret that holds the Wickr IO configuration and the custom integration code in S3, is controlled via an 
+IAM user. The IAM credentials are stored in AWS Secrets Manager and rotated automatically on a regular basis 
+([SEC02-BP05 Audit and rotate credentials periodically](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_identities_audit.html)).
+After a secret rotation, the EC2 instance needs to be rebooted. 
+The IAM user's AWS access key ID and secret access key are installed in the `~/.aws` directory on the EC2 instance 
+at reboot.
+4. The Wickr IO custom integration code requires a Wickr IO bot user in order to communicate with the Wickr 
+service (see also the Wickr IO documentation [Wickr IO Client Creation](https://wickrinc.github.io/wickrio-docs/#configuration-wickr-io-client-creation)).
+The Wickr IO bot user credentials are provided during `cdk deploy` via `--context` parameters (see also [Deployment](#deployment)). 
+Please note, the Wickr IO bot user credentials are not rotated automatically. A regular, manual rotation via the Wickr
+admin console is recommended ([Wickr IO Client Creation](https://wickrinc.github.io/wickrio-docs/#configuration-wickr-io-client-creation)). 
+5. For communication with the AWS GenAI LLM Chatbot solution a Cognito user is generated during deployment in the Cognito 
+user pool of the AWS GenAI LLM Chatbot solution. The password for this user is stored in AWS Secrets Manager and rotated
+automatically on a regular basis.
+6. After deployment, the user uses the Wickr client software to initiate a conversation with the Wickr IO bot user. Then,
+the custom integration code running in the Wickr IO docker container authenticates to the AWS GenAI LLM Chatbot using
+the Cognito user. After successful authentication, messages are exchanged via the AppSync GraphQL API.
 
 ## Security
 
