@@ -127,6 +127,12 @@ cdk deploy --all --context bot_user_id="WickrClientAccount" --context bot_passwo
 
 The deployment takes around 5 minutes to complete.
 
+## End user experience
+
+Watch the video below to get an impression of the user experience first before deploying the project.
+
+https://github.com/aws-samples/secure-messenger-genai-chatbot/assets/149990130/10e31a61-1a7b-4c70-803e-d4c00c07bcac
+
 ## Troubleshooting
 
 In case of issues it is recommended to check the Wickr IO integration code log files for 
