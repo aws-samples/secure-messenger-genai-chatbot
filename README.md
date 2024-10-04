@@ -166,7 +166,7 @@ This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) fil
 ## Contributors
 
  - [Stefan Dittforth](https://www.linkedin.com/in/stefandittforth/)
- - Charles Chowdhury-Hanscombe
+ - Charles H.
  - [Otto Kruse](https://www.linkedin.com/in/ockruse/)
 
 ## Disclaimers
